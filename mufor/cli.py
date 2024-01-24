@@ -7,7 +7,7 @@ def main(config, *args):
     """Main entry point."""
 
     errors = config["errors"]
-    path = config["path"]
+    path = config["path"]["files"]
 
     command = input(path + "> ").split(" ")
     while True:
@@ -17,7 +17,7 @@ def main(config, *args):
             case ["hp"]:
                 print(_help_default())
             case ["cd", *args]:
-                _cd(path, args[0])
+                config = _cd(path, config, args[0])
             case ["ls"]:
                 print(os.listdir(path))
             case ["mf", *args]:
@@ -26,6 +26,8 @@ def main(config, *args):
                 _download(config, path, *args)
             case ["dp", *args]:
                 _download(config, path, *args, playlist=True)
+            case ["ua", *args]:
+                _update_files(config, path, *args)
             case _:
                 if errors:
                     print("invalid command , for more info type hp")
@@ -35,15 +37,19 @@ def main(config, *args):
         # /media/dserver/Data/Audio/mufor/tests
 
 
-def _cd(path: str, dir: str):
+def _update_files(config, path, *args):
+    loader.load_all(config, path, *args)
+
+
+def _cd(path: str, config, dir: str):
     try:
-        os.chdir(dir)
+        config["path"]["files"] = path
     except FileNotFoundError:
         try:
-            os.chdir(path + "/" + dir)
+            config["path"]["files"] = path + "/" + dir
         except FileNotFoundError:
             print("\ninvalid directory: " + dir)
-    return len(dir)
+    return config
 
 
 def _help_default():
@@ -59,7 +65,7 @@ def _help_default():
     return help
 
 
-def _download(config, path, *args, **kwargs):
+def _download(config, path,playlist, *args):
     link = pyperclip.paste()
     if len(args) < 1:
         type = config["format"]["default"]
@@ -75,4 +81,4 @@ def _download(config, path, *args, **kwargs):
         link = input("link: ")
         type = input("type: ")
     config["format"]["default"] = type
-    loader.download(link, config, path + "/", **kwargs)
+    loader.download(config,link,path + "/",playlist=playlist)

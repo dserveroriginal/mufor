@@ -4,65 +4,87 @@ from mufor import ytdlp
 import hashlib
 
 
-def download(url: str, config, dir: str, playlist=False, load=True,**kwargs):
+def download(config, url: str, dir: str, id: str = "", playlist: bool = False):
     """Download a file from a URL to a local file."""
 
     if not playlist:
-        return _load(url, config, dir,load, **kwargs)
+        singles = _get_ids(config["path"]["links"])["id"]
+        if id in singles:
+            return ""
+        return [_load(url, config, dir)]
     else:
-        info = ytdlp.get_playlist(url)
-        files = []
-
-        if info is not None:
-            for video in info["entries"]:
-                files += [_load(video["webpage_url"], config, dir, load, **kwargs)]
-
-        return files
+        return load_all(config, dir, link=url)
 
 
-def _load(url: str, config, dir: str, load, **kwargs):
-    filename = dir + "%(release_date,upload_date|Unknown)s__"
-    filename += "%(fulltitle|Unnamed)s__"
-    filename += "%(creator,channel|Author unknown)s__"
-    filename += "%(playlist|None)s__"
-    filename += "%(id)s__"
-    filename += ".%(ext)s"
-    filename = ytdlp.load(
-        url,
-        filename,
-        load,
-        config["format"][config["format"]["default"]],
-        kwargs=kwargs,
-    )
+def load_all(config, dir: str, link: str = ""):
+    if link.__eq__(""):
+        link_list = open(config["path"]["links"] + "links.txt", "r").read().split("\n")
+    else:
+        link_list = [link]
 
-    if filename.__eq__(""):
-        return filename
-    
-    tagparts = filename.split(".")
-    # ext= tagparts[-1]
-    tagparts = [tagparts[0].split("/")[-1]] + tagparts[1:]
-    tags = tagparts[-2].split("__")
+    ids = []
 
-    if filename.endswith(".NA"):
+    for link in link_list:
+        if link.__eq__(""):
+            continue
+        info = ytdlp.get_info(link)
+        if info is None:
+            raise Exception("Error loading info")
+        print(link)
+
+        if info["_type"] == "video":
+            ids += download(config, link, dir, info["id"])
+            continue
+
+        for video in info["entries"]:
+            ids += download(config, video["webpage_url"], dir, video["id"])
+
+    return ids
+
+
+def _load(url: str, config, dir: str = ""):
+    if url.__eq__(""):
         return ""
+    info = ytdlp.get_info(url)
+    if info is None:
+        raise Exception("Error loading info")
 
-    newfilename = filename.replace(" ", "_")
-    filename = newfilename if os.rename(filename, newfilename) is None else filename
+    tags = {
+        "date":info["upload_date"],
+        "title":info["title"],
+        "artist":info["channel"],
+        "playlist":info["playlist"],
+        "id":info["id"]
+    }
+
+    if dir.__eq__(""):
+        dir = config["path"]["files"]
+
+    filename = (
+        dir
+        + "/"
+        + config["sheme"]
+        % {
+            "date": tags["date"],
+            "title": tags["title"],
+            "artist": tags["artist"],
+            "album": tags["playlist"],
+            "comment": tags["id"],
+            "ext": "%(ext)s",
+            "md5": hashlib.md5(tags["id"].encode()).hexdigest(),
+            "id": id,
+            "version": config["version"]["number"] + config["version"]["name"],
+        }
+    )
+    filename = ytdlp.load(url, filename, config["format"][config["format"]["default"]])
+
+    if filename.endswith(".NA") or filename.__eq__(""):
+        return ""
 
     # print(filename)
 
-    newfilename = dir + (
-        config["sheme"]
-        % {
-            "version": config["version"]["number"] + config["version"]["name"],
-            "md5": hashlib.md5(tags[4].encode()).hexdigest(),
-            "date": tags[0],
-            "title": tags[1],
-            "artist": tags[2],
-            "album": tags[3],
-            "comment": tags[4],
-            "ext": config["format"][config["format"]["default"]],
-        }
+    newfilename = filename.replace(
+        filename.split(".")[-1], config["format"][config["format"]["default"]]
     )
 
     # print(newfilename, filename)
@@ -70,11 +92,33 @@ def _load(url: str, config, dir: str, load, **kwargs):
     filename = ffmpegplug.convert(
         filename,
         newfilename,
-        date=tags[0],
-        title=tags[1],
-        artist=tags[2],
-        album=tags[3],
-        comment=url,
+        date=tags["date"],
+        title=tags["title"],
+        artist=tags["artist"],
+        album=tags["playlist"],
+        comment=tags["id"],
     )
+    
+    ids=_get_ids(config["path"]["links"])
+    ids["id"].append(tags["id"])
+    _write_ids(config, ids)
 
-    return filename
+    return tags["id"]
+
+
+def _write_ids(config, loaded):
+    import json
+
+    path = config["path"]["links"]
+    file = open(path + "loaded.json", "w")
+    json.dump(loaded, file)
+    file.close()
+
+
+def _get_ids(path):
+    import json
+
+    file = open(path + "loaded.json", "r")
+    loaded = json.load(file)
+    file.close()
+    return loaded

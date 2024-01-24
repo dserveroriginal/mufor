@@ -65,7 +65,7 @@ class TestYDPlug(unittest.TestCase):
         self._assert_download(filename, format="mp3")
 
     def test_playlist(self):
-        info = ytdlp.get_playlist(
+        info = ytdlp.get_info(
             "https://www.youtube.com/playlist?list=PLtyo3aqsNv_Oe686OmaAi1heDjjnxYRmw"
         )
 

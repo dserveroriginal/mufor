@@ -1,0 +1,22 @@
+{
+    "format": {
+        "audio": "mp3",
+        "video": "mp4",
+        "default":"audio"
+    },
+    "errors": false,
+    "ui": {
+        "language": "en",
+        "theme": "dark",
+        "mode": "cli"
+    },
+    "path":{
+        "files":"%(here)s/.files",
+        "links":"%(here)s/.files/links.txt"
+    },
+    "sheme":"%(version)s%(md5)s.%(ext)s",
+    "version":{
+        "number":"1",
+        "name":"dihydrogen"
+    }
+}

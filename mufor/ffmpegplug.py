@@ -5,10 +5,6 @@ import os
 def convert(inputfile: str, outputfile: str, ffmpeg: str = "ffmpeg", **kwargs):
     """Convert a file to another format."""
 
-    for key, value in kwargs.items():
-        if value is None:
-            del kwargs[key]
-
     tags = [f"{key}={value}" for key, value in kwargs.items()]
 
     args = []

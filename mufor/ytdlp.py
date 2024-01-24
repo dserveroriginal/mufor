@@ -5,24 +5,18 @@ ydlaudio = ["3gp", "aac", "m4a", "mp3", "ogg", "wav"]
 ydl = ydlaudio + ["mp4", "webm", "flv"]
 
 
-def get_playlist(url: str, youtube_dl: str = "yt-dlp"):
+def get_info(url: str):
     """Get a playlist from a URL."""
-    # if youtube_dl.__eq__("yt-dlp"):
 
-    with YoutubeDL({"dump_single_json": True}) as ydl:
+    with YoutubeDL({"dump_single_json": True, "quiet": True}) as ydl:
         info = ydl.extract_info(url, download=False)
-    # else:
-
-    # TODO: do something about this
     return info
 
 
 def load(
     url: str,
     filename: str,
-    load: bool,
     format: str = "",
-    youtube_dl: str = "yt-dlp",
     **kwargs,
 ):
     """Load a file from a URL."""
@@ -34,12 +28,12 @@ def load(
         # if youtube_dl.__eq__("yt-dlp"):
 
         with YoutubeDL({"outtmpl": filename, "format": format}) as ydl:
-            file = ydl.prepare_filename(ydl.extract_info(url, download=load))
+            file = ydl.prepare_filename(ydl.extract_info(url))
     except:
         if format.__eq__(""):
             raise Exception("Error loading file")
         # if youtube_dl.__eq__("yt-dlp"):
-        file = _load_any(url, filename, load)
+        file = _load_any(url, filename)
 
     return file
 
@@ -47,12 +41,10 @@ def load(
 def _load_any(
     url: str,
     filename: str,
-    download: bool,
-    youtube_dl: str = "yt-dlp",
 ):
     """Last resort for loading a file from a URL."""
 
-    return load(url, filename, download)
+    return load(url, filename)
 
 
 def _get_format(format: str, filename: str):
