@@ -161,4 +161,4 @@ cython_debug/
 
 
 ; Personal config
-.personal/
+.personal
