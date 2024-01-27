@@ -16,11 +16,27 @@ def download(config, url: str, dir: str, id: str = "", playlist: bool = False):
         return load_all(config, dir, link=url)
 
 
-def load_all(config, dir: str, link: str = ""):
+def load_all(config, dir: str, link: str = "", archive: bool = False):
+    
+    if archive:
+        path=config["path"]["links"]+"archive.txt"
+    else:
+        path=config["path"]["links"]+"links.txt"
+        
     if link.__eq__(""):
-        link_list = open(config["path"]["links"] + "links.txt", "r").read().split("\n")
+        link_list = open(path, "r").read().split("\n")
     else:
         link_list = [link]
+        
+    if not archive:
+        file = open(config["path"]["links"] + "archive.txt", "a")
+        for link in link_list:
+            file.write(link + "\n")
+        file.close()
+
+        file = open(path, "w")
+        file.write("")
+        file.close()
 
     ids = []
 

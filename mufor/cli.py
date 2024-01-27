@@ -26,7 +26,7 @@ def main(config, *args):
                 _download(config, path, *args)
             case ["dp", *args]:
                 _download(config, path, *args, playlist=True)
-            case ["ua", *args]:
+            case ["ua", *args]:                    
                 _update_files(config, path, *args)
             case _:
                 if errors:
@@ -38,7 +38,11 @@ def main(config, *args):
 
 
 def _update_files(config, path, *args):
-    loader.load_all(config, path, *args)
+    if args[0].__eq__("-a"):
+        all = True
+    else:
+        all = False
+    loader.load_all(config, path, archive=all)
 
 
 def _cd(path: str, config, dir: str):
