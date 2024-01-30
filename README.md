@@ -37,4 +37,4 @@ But please make sure to read the [contributing guidelines](CONTRIBUTING.md) firs
 
 ## "License"
 
-This project is "licensed" under the [Unlicense](UNLICENSE).
+This project is "licensed" under the [Unlicense](LICENSE).
