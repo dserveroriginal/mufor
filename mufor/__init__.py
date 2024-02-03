@@ -1,7 +1,7 @@
-import sys
+from mufor.cli import _update_files
 
 
-def main(use_cfg: bool = True, *args):
+def main(*args):
     """Main entry point."""
 
     from mufor import config as cfg
@@ -12,7 +12,12 @@ def main(use_cfg: bool = True, *args):
     print(config["format"])
     print(config["path"])
     print(config["sheme"])
-
+    
+    if args.__len__() > 0:
+        if args[0].__contains__("-u"):
+            _update_files(config, config["path"]["files"], "-a")
+            return 0
+    
     if config["ui"]["mode"].startswith("cli"):
         _load_cli(config, *args)
     elif config["ui"]["mode"].startswith("gui"):
