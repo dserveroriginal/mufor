@@ -92,7 +92,20 @@ def _load(url: str, config, dir: str = ""):
             "version": config["version"]["number"] + config["version"]["name"],
         }
     )
-    filename = ytdlp.load(url, filename, config["format"][config["format"]["default"]])
+    format = config["format"][config["format"]["default"]]
+    filename=filename
+    try:
+        print(filename)
+        filename = ytdlp.load(url, filename, format)
+    except Exception as e:
+        filename=filename+"."+format
+        webpthumbnail = filename.replace(filename.split(".")[-1], "webp")
+        jpgthumbnail = filename.replace(filename.split(".")[-1], "jpg")
+        
+        if (os.path.exists(webpthumbnail) or os.path.exists(jpgthumbnail) ) and os.path.exists(filename):
+            pass
+        else:
+            raise e
 
     if filename.endswith(".NA") or filename.__eq__(""):
         return ""

@@ -1,5 +1,7 @@
 # file formatter
 
+# DO NOT USE THIS PROJECT YET, IT'S NOT READY FOR USE AND IS GARBO (I'm working on it)
+
 This project started as a music file formatter with some special sauce that helps you organize your downloaded music files, but now idk what it is anymore.
 
 ## Features
