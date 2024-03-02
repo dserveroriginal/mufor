@@ -5,7 +5,7 @@
 This project started as a music file formatter with some special sauce that helps you organize your downloaded music files, but now idk what it is anymore.
 
 ## Features
-
+none working
 - Renames music files using a consistent naming convention.
 - Moves sorted music files to specified destination folders.
 
@@ -30,6 +30,10 @@ This project started as a music file formatter with some special sauce that help
 
     ```shell
     python -m mufor
+    ```
+    or
+    ```shell
+    python -m mufor -u
     ```
 
 ## Contributing
