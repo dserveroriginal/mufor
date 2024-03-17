@@ -2,12 +2,17 @@ import os
 from mufor import format, loader
 import pyperclip
 
+def noui(config,*args):
+    if args[0].__contains__("-u"):
+            _update_files(config, config["path"]["loading"], "-a")
+            _move_all(config, config["path"]["loading"], config["path"]["files"])
+            return 0
 
 def main(config, *args):
     """Main entry point."""
 
     errors = config["errors"]
-    path = config["path"]["files"]
+    path = config["path"]["loading"]
 
     command = input(path + "> ").split(" ")
     while True:
@@ -43,14 +48,22 @@ def _update_files(config, path, *args):
     else:
         all = False
     loader.load_all(config, path, archive=all)
+    
+def _move_all(config, path, dir):
+    files = os.listdir(path)
+    for file in files:
+        if file.__eq__("archive.txt") or file.__eq__("links.txt"):
+            continue
+        os.rename(path + "/" + file, dir + "/" + file)
+    return 0
 
 
 def _cd(path: str, config, dir: str):
     try:
-        config["path"]["files"] = path
+        config["path"]["loading"] = path
     except FileNotFoundError:
         try:
-            config["path"]["files"] = path + "/" + dir
+            config["path"]["loading"] = path + "/" + dir
         except FileNotFoundError:
             print("\ninvalid directory: " + dir)
     return config

@@ -15,7 +15,8 @@ def get_info(url: str):
 def load(
     url: str,
     filename: str,
-    format: str = ""
+    format: str = "",
+    ffmpeg_location: str ="/usr/bin/"
 ):
     """Load a file from a URL."""
 
@@ -28,7 +29,7 @@ def load(
         "writethumbnail":True,
         "postprocessors": [{"key":"FFmpegExtractAudio","preferredcodec":format}],
         "verbose":True,
-        "ffmpeg_location":".venv/bin/ffmpeg/bin"
+        "ffmpeg_location":ffmpeg_location
     }
     with YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url)

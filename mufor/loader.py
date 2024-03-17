@@ -74,7 +74,7 @@ def _load(url: str, config, dir: str = ""):
     }
 
     if dir.__eq__(""):
-        dir = config["path"]["files"]
+        dir = config["path"]["loading"]
 
     filename = (
         dir
@@ -94,9 +94,10 @@ def _load(url: str, config, dir: str = ""):
     )
     format = config["format"][config["format"]["default"]]
     filename=filename
+    ffmpeg_location = config["path"]["ffmpeg"]
     try:
         print(filename)
-        filename = ytdlp.load(url, filename, format)
+        filename = ytdlp.load(url, filename, format,ffmpeg_location)
     except Exception as e:
         filename=filename+"."+format
         webpthumbnail = filename.replace(filename.split(".")[-1], "webp")

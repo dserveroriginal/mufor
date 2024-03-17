@@ -1,4 +1,3 @@
-from mufor.cli import _update_files
 
 
 def main(*args):
@@ -14,9 +13,8 @@ def main(*args):
     print(config["sheme"])
     
     if args.__len__() > 0:
-        if args[0].__contains__("-u"):
-            _update_files(config, config["path"]["files"], "-a")
-            return 0
+        _one_line(config,*args)
+        
     
     if config["ui"]["mode"].startswith("cli"):
         _load_cli(config, *args)
@@ -32,7 +30,10 @@ def _load_cli(config, *args):
 
     cli.main(config, *args)
 
-
+def _one_line(config,*args):
+    from mufor.cli import noui
+    noui(config,*args)
+    
 def _load_gui(config, *args):
     """Load GUI."""
     # TODO: implement
